@@ -1,0 +1,33 @@
+Model Functionalities
+=====================
+
+This section provides a detailed overview of the various modules within the `core.model` package of our project. Each module contains a set of functionalities that are integral to the operation of our model.
+
+core.model.model
+----------------
+
+This module contains the main model functionalities.
+
+.. automodule:: core.model.model
+    :members:
+    :special-members:
+    
+
+core.model.basic_modules
+------------------------
+
+This module contains the basic building blocks used in our model.
+
+.. automodule:: core.model.basic_modules
+    :members:
+    :special-members:
+
+core.model.attention_modules
+----------------------------
+
+This module contains the attention mechanisms used in our model.
+
+.. automodule:: core.model.attention_modules
+    :members:
+    :special-members:
+

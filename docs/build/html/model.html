@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Model Functionalities &mdash; Vae_Train_and_Extract  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Metrics and Utilities" href="util.html" />
+    <link rel="prev" title="Welcome to Vae_Train_and_Extract’s documentation!" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Vae_Train_and_Extract
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Model Functionalities</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#core-model-model">core.model.model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#core-model-basic-modules">core.model.basic_modules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#modules-used-in-building-the-main-model">Modules used in building the main model</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#classes">Classes</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#core-model-attention-modules">core.model.attention_modules</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="util.html">Metrics and Utilities</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Vae_Train_and_Extract</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Model Functionalities</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/model.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="model-functionalities">
+<h1>Model Functionalities<a class="headerlink" href="#model-functionalities" title="Permalink to this heading"></a></h1>
+<p>This section provides a detailed overview of the various modules within the <cite>core.model</cite> package of our project. Each module contains a set of functionalities that are integral to the operation of our model.</p>
+<section id="core-model-model">
+<h2>core.model.model<a class="headerlink" href="#core-model-model" title="Permalink to this heading"></a></h2>
+<p>This module contains the main model functionalities.</p>
+<span class="target" id="module-core.model.model"></span><p>This module defines a <strong>Variational Autoencoder (VAE)</strong> model with a unique architecture designed for image data. 
+The model allows for the imposition of a <em>sparsity constraint</em> on certain layers, which can be useful for learning 
+more compact or interpretable representations. The model is composed of an encoder, which uses a VGG19 architecture 
+and includes a pixel shuffling operation, and a decoder, which gradually upscales the feature maps back to the 
+original image size. The model also includes a method for accessing the activations of any layer.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">Example</span> <span class="n">usage</span><span class="p">:</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">Model</span><span class="p">(</span><span class="s1">&#39;model_name&#39;</span><span class="p">,</span> <span class="s1">&#39;cuda&#39;</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="mf">1.</span><span class="p">,</span> <span class="mf">0.001</span><span class="p">)</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">224</span><span class="p">,</span> <span class="mi">224</span><span class="p">)</span>
+    <span class="n">output</span><span class="p">,</span> <span class="n">kl</span><span class="p">,</span> <span class="n">att</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="py class">
+<dt class="sig sig-object py" id="core.model.model.Model">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.model.model.</span></span><span class="sig-name descname"><span class="pre">Model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layer_sparsity_cstraint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attention</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sparsity_coeff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sparsity_param</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.model.model.Model" title="Permalink to this definition"></a></dt>
+<dd><p>A <strong>Variational Autoencoder (VAE)</strong> model with a unique architecture designed for image data. The model allows 
+for the imposition of a <em>sparsity constraint</em> on certain layers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model_name</strong> (<em>str</em>) – The name of the model.</p></li>
+<li><p><strong>device</strong> (<em>str</em>) – The device to run the model on (‘cpu’ or ‘cuda’).</p></li>
+<li><p><strong>layer_sparsity_cstraint</strong> (<em>list</em><em>, </em><em>optional</em>) – A list of indices of layers to apply the sparsity constraint to.</p></li>
+<li><p><strong>attention</strong> (<em>list</em><em>, </em><em>optional</em>) – A list of attention values.</p></li>
+<li><p><strong>sparsity_coeff</strong> (<em>float</em><em>, </em><em>optional</em>) – The coefficient for the sparsity constraint.</p></li>
+<li><p><strong>sparsity_param</strong> (<em>float</em><em>, </em><em>optional</em>) – The parameter for the sparsity constraint.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="core.model.model.Model.decode">
+<span class="sig-name descname"><span class="pre">decode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.model.model.Model.decode" title="Permalink to this definition"></a></dt>
+<dd><p>Decodes the input from the latent space.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>torch.Tensor</em>) – The input tensor.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The decoded tensor.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>torch.Tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.model.model.Model.encode">
+<span class="sig-name descname"><span class="pre">encode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.model.model.Model.encode" title="Permalink to this definition"></a></dt>
+<dd><p>Encodes the input into the latent space.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>torch.Tensor</em>) – The input tensor.</p></li>
+<li><p><strong>sample</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to sample from the latent space.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The encoded tensor.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>torch.Tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.model.model.Model.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.model.model.Model.forward" title="Permalink to this definition"></a></dt>
+<dd><p>Passes the input through the model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>torch.Tensor</em>) – The input tensor.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A tuple containing the output tensor, the KL divergence, and the attention values.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.model.model.Model.get_activations">
+<span class="sig-name descname"><span class="pre">get_activations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layer_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.model.model.Model.get_activations" title="Permalink to this definition"></a></dt>
+<dd><p>Returns the activations of a specific layer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>torch.Tensor</em>) – The input tensor.</p></li>
+<li><p><strong>layer_name</strong> (<em>str</em>) – The name of the layer.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The activations of the layer.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>torch.Tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="core.model.model.PixelShuffler">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.model.model.</span></span><span class="sig-name descname"><span class="pre">PixelShuffler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">upscale_factor</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.model.model.PixelShuffler" title="Permalink to this definition"></a></dt>
+<dd><p>A module that performs <strong>pixel shuffling</strong>, which is a way of upscaling the feature maps without 
+introducing any new parameters. The upscale factor determines the factor by which the spatial 
+dimensions are increased.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>upscale_factor</strong> (<em>int</em>) – The factor by which to upscale the feature maps.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="core.model.model.PixelShuffler.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.model.model.PixelShuffler.forward" title="Permalink to this definition"></a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="core-model-basic-modules">
+<h2>core.model.basic_modules<a class="headerlink" href="#core-model-basic-modules" title="Permalink to this heading"></a></h2>
+<p>This module contains the basic building blocks used in our model.</p>
+<span class="target" id="module-core.model.basic_modules"></span><section id="modules-used-in-building-the-main-model">
+<h3>Modules used in building the main model<a class="headerlink" href="#modules-used-in-building-the-main-model" title="Permalink to this heading"></a></h3>
+<p>This module provides classes for building a neural network with optional sparsity constraints. It is designed to work with a pretrained VGG19 model, but can be adapted to other models as well.</p>
+<section id="classes">
+<h4>Classes<a class="headerlink" href="#classes" title="Permalink to this heading"></a></h4>
+<dl class="simple">
+<dt><strong>NoConstraint</strong></dt><dd><p>A module that applies a ReLU activation function to its input. (The encoder is built from <strong>ConvBlock</strong>, <strong>MeanStdFeatureMaps</strong> and <strong>Reparametrization</strong> layers. All of them have a <strong>add_constraint</strong> function that switches their <strong>NoConstraint</strong> to <strong>SparsityConstraint</strong>)</p>
+</dd>
+<dt><strong>SparsityConstraint</strong></dt><dd><p>A module that applies a sigmoid activation function to its input, then computes the KL divergence between the mean activation and a constant distribution. This is used to encourage sparsity in the activations.</p>
+</dd>
+<dt><strong>ResBlock</strong></dt><dd><p>A standard residual block, which consists of two convolutional layers with batch normalization and LeakyReLU activation, followed by an addition operation that adds the input to the output of the convolutions.</p>
+</dd>
+<dt><strong>ConvBlock</strong></dt><dd><p>A module that wraps a convolutional layer with a ReLU activation function and an optional sparsity constraint. The sparsity constraint can be added using the <cite>add_constraint</cite> method.</p>
+</dd>
+<dt><strong>VGG19_Features</strong></dt><dd><p>A module that extracts non-pretrained VGG19 feature extractor, organizes it in a module where you can apply the sparsity constraints anywhere as well as add attention layers.</p>
+</dd>
+<dt><strong>MeanStdFeatureMaps</strong></dt><dd><p>A module which generates a set of featuremaps for means and one for stds. It must be followed by a Reparametrization module.</p>
+</dd>
+<dt><strong>Reparametrization</strong></dt><dd><p>A module which performs re-parametrization (sampling from a gaussian, then x sig + mu). The module right before must be a MeanStdFeatureMaps() module.</p>
+</dd>
+</dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="core.model.basic_modules.ConvBlock">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.model.basic_modules.</span></span><span class="sig-name descname"><span class="pre">ConvBlock</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conv2d</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idx</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.model.basic_modules.ConvBlock" title="Permalink to this definition"></a></dt>
+<dd><p>A PyTorch module that wraps a convolutional layer with a ReLU activation function and an optional 
+sparsity constraint. The sparsity constraint can be added using the <cite>add_constraint</cite> method.</p>
+<dl class="simple">
+<dt>name: str</dt><dd><p>The name of the ConvBlock, which includes the index and the activation function used.</p>
+</dd>
+<dt>conv: torch.nn.Conv2d</dt><dd><p>The convolutional layer wrapped by the ConvBlock.</p>
+</dd>
+<dt>constraint: torch.nn.Module</dt><dd><p>The constraint applied to the output of the convolutional layer. This is initially a NoConstraint instance, 
+but can be replaced with a SparsityConstraint instance using the <cite>add_constraint</cite> method.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>forward(x: torch.Tensor) -&gt; Tuple[torch.Tensor, float]</dt><dd><p>Applies the convolutional layer and the constraint to the input tensor and returns the result.</p>
+</dd>
+<dt>add_constraint(constraint_param: float, scaling_param: float) -&gt; None</dt><dd><p>Replaces the current constraint with a SparsityConstraint instance using the provided parameters.</p>
+</dd>
+<dt>get_activations(x: torch.Tensor) -&gt; torch.Tensor</dt><dd><p>Applies the convolutional layer and the constraint to the input tensor and returns the result without gradients.</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.model.basic_modules.ConvBlock.__annotations__">
+<span class="sig-name descname"><span class="pre">__annotations__</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#core.model.basic_modules.ConvBlock.__annotations__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.model.basic_modules.ConvBlock.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conv2d</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idx</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.model.basic_modules.ConvBlock.__init__" title="Permalink to this definition"></a></dt>
+<dd><p>Initializes internal Module state, shared by both nn.Module and ScriptModule.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.model.basic_modules.ConvBlock.__module__">
+<span class="sig-name descname"><span class="pre">__module__</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'core.model.basic_modules'</span></em><a class="headerlink" href="#core.model.basic_modules.ConvBlock.__module__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.model.basic_modules.ConvBlock.add_constraint">
+<span class="sig-name descname"><span class="pre">add_constraint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">constraint_param</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scaling_param</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.model.basic_modules.ConvBlock.add_constraint" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.model.basic_modules.ConvBlock.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.model.basic_modules.ConvBlock.forward" title="Permalink to this definition"></a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.model.basic_modules.ConvBlock.get_activations">
+<span class="sig-name descname"><span class="pre">get_activations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.model.basic_modules.ConvBlock.get_activations" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="core.model.basic_modules.MeanStdFeatureMaps">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.model.basic_modules.</span></span><span class="sig-name descname"><span class="pre">MeanStdFeatureMaps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">in_channels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latent_dim</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.model.basic_modules.MeanStdFeatureMaps" title="Permalink to this definition"></a></dt>
+<dd><p>A PyTorch module which generates a set of feature maps for means and one for standard deviations. 
+It must be followed by a Reparametrization module.</p>
+<dl class="simple">
+<dt>name: str</dt><dd><p>The name of the MeanStdFeatureMaps module, which includes the activation function used.</p>
+</dd>
+<dt>conv_means: torch.nn.Conv2d</dt><dd><p>The convolutional layer that generates the mean feature maps.</p>
+</dd>
+<dt>conv_stds: torch.nn.Conv2d</dt><dd><p>The convolutional layer that generates the standard deviation feature maps.</p>
+</dd>
+<dt>constraint: torch.nn.Module</dt><dd><p>The constraint applied to the output of the convolutional layers. This is initially a NoConstraint instance, 
+but can be replaced with a SparsityConstraint instance using the <cite>add_constraint</cite> method.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>forward(x: torch.Tensor) -&gt; Tuple[torch.Tensor, float]</dt><dd><p>Applies the convolutional layers and the constraint to the input tensor and returns the result.</p>
+</dd>
+<dt>add_constraint(constraint_param: float, scaling_param: float) -&gt; None</dt><dd><p>Replaces the current constraint with a SparsityConstraint instance using the provided parameters.</p>
+</dd>
+<dt>get_activations(x: torch.Tensor, mean_or_std: str) -&gt; torch.Tensor</dt><dd><p>Applies the appropriate convolutional layer and the constraint to the input tensor and returns the result without gradients.</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.model.basic_modules.MeanStdFeatureMaps.__annotations__">
+<span class="sig-name descname"><span class="pre">__annotations__</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#core.model.basic_modules.MeanStdFeatureMaps.__annotations__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.model.basic_modules.MeanStdFeatureMaps.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">in_channels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latent_dim</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.model.basic_modules.MeanStdFeatureMaps.__init__" title="Permalink to this definition"></a></dt>
+<dd><p>Initializes internal Module state, shared by both nn.Module and ScriptModule.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.model.basic_modules.MeanStdFeatureMaps.__module__">
+<span class="sig-name descname"><span class="pre">__module__</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'core.model.basic_modules'</span></em><a class="headerlink" href="#core.model.basic_modules.MeanStdFeatureMaps.__module__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.model.basic_modules.MeanStdFeatureMaps.add_constraint">
+<span class="sig-name descname"><span class="pre">add_constraint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">constraint_param</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scaling_param</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.model.basic_modules.MeanStdFeatureMaps.add_constraint" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.model.basic_modules.MeanStdFeatureMaps.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.model.basic_modules.MeanStdFeatureMaps.forward" title="Permalink to this definition"></a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.model.basic_modules.MeanStdFeatureMaps.get_activations">
+<span class="sig-name descname"><span class="pre">get_activations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mean_or_std</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.model.basic_modules.MeanStdFeatureMaps.get_activations" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="core.model.basic_modules.NoConstraint">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.model.basic_modules.</span></span><span class="sig-name descname"><span class="pre">NoConstraint</span></span><a class="headerlink" href="#core.model.basic_modules.NoConstraint" title="Permalink to this definition"></a></dt>
+<dd><p>A PyTorch module that applies a ReLU activation function to its input. 
+This class is used as a placeholder when no sparsity constraint is desired.</p>
+<p>None</p>
+<dl class="simple">
+<dt>forward(x: torch.Tensor) -&gt; Tuple[torch.Tensor, float]</dt><dd><p>Applies the ReLU activation function to the input tensor and returns the result along with 0.0.</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.model.basic_modules.NoConstraint.__annotations__">
+<span class="sig-name descname"><span class="pre">__annotations__</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#core.model.basic_modules.NoConstraint.__annotations__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.model.basic_modules.NoConstraint.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#core.model.basic_modules.NoConstraint.__init__" title="Permalink to this definition"></a></dt>
+<dd><p>Initializes internal Module state, shared by both nn.Module and ScriptModule.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.model.basic_modules.NoConstraint.__module__">
+<span class="sig-name descname"><span class="pre">__module__</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'core.model.basic_modules'</span></em><a class="headerlink" href="#core.model.basic_modules.NoConstraint.__module__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.model.basic_modules.NoConstraint.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.model.basic_modules.NoConstraint.forward" title="Permalink to this definition"></a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="core.model.basic_modules.Reparametrization">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.model.basic_modules.</span></span><span class="sig-name descname"><span class="pre">Reparametrization</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">device</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.model.basic_modules.Reparametrization" title="Permalink to this definition"></a></dt>
+<dd><p>A PyTorch module which performs re-parametrization (sampling from a Gaussian, then x sig + mu). 
+The module right before must be a MeanStdFeatureMaps() module.</p>
+<dl class="simple">
+<dt>name: str</dt><dd><p>The name of the Reparametrization module, which includes the activation function used.</p>
+</dd>
+<dt>constraint: torch.nn.Module</dt><dd><p>The constraint applied to the output of the re-parametrization. This is initially a NoConstraint instance, 
+but can be replaced with a SparsityConstraint instance using the <cite>add_constraint</cite> method.</p>
+</dd>
+<dt>normal: torch.distributions.Normal</dt><dd><p>A Normal distribution used for sampling in the re-parametrization.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>forward(x: torch.Tensor) -&gt; Tuple[torch.Tensor, float]</dt><dd><p>Performs the re-parametrization on the input tensor and returns the result.</p>
+</dd>
+<dt>add_constraint(constraint_param: float, scaling_param: float) -&gt; None</dt><dd><p>Replaces the current constraint with a SparsityConstraint instance using the provided parameters.</p>
+</dd>
+<dt>get_activations(x: torch.Tensor) -&gt; torch.Tensor</dt><dd><p>Performs the re-parametrization on the input tensor and returns the result without gradients.</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.model.basic_modules.Reparametrization.__annotations__">
+<span class="sig-name descname"><span class="pre">__annotations__</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#core.model.basic_modules.Reparametrization.__annotations__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.model.basic_modules.Reparametrization.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">device</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.model.basic_modules.Reparametrization.__init__" title="Permalink to this definition"></a></dt>
+<dd><p>Initializes internal Module state, shared by both nn.Module and ScriptModule.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.model.basic_modules.Reparametrization.__module__">
+<span class="sig-name descname"><span class="pre">__module__</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'core.model.basic_modules'</span></em><a class="headerlink" href="#core.model.basic_modules.Reparametrization.__module__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.model.basic_modules.Reparametrization.add_constraint">
+<span class="sig-name descname"><span class="pre">add_constraint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">constraint_param</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scaling_param</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.model.basic_modules.Reparametrization.add_constraint" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.model.basic_modules.Reparametrization.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.model.basic_modules.Reparametrization.forward" title="Permalink to this definition"></a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.model.basic_modules.Reparametrization.get_activations">
+<span class="sig-name descname"><span class="pre">get_activations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.model.basic_modules.Reparametrization.get_activations" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="core.model.basic_modules.ResBlock">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.model.basic_modules.</span></span><span class="sig-name descname"><span class="pre">ResBlock</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nb_chan</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.model.basic_modules.ResBlock" title="Permalink to this definition"></a></dt>
+<dd><p>A standard residual block, which consists of two convolutional layers with batch normalization 
+and LeakyReLU activation, followed by an addition operation that adds the input to the output 
+of the convolutions.</p>
+<dl class="simple">
+<dt>operations: torch.nn.Sequential</dt><dd><p>A sequence of operations that define the residual block.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>forward(x: torch.Tensor) -&gt; torch.Tensor</dt><dd><p>Applies the operations of the residual block to the input tensor and returns the result.</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.model.basic_modules.ResBlock.__annotations__">
+<span class="sig-name descname"><span class="pre">__annotations__</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#core.model.basic_modules.ResBlock.__annotations__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.model.basic_modules.ResBlock.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nb_chan</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.model.basic_modules.ResBlock.__init__" title="Permalink to this definition"></a></dt>
+<dd><p>Initializes internal Module state, shared by both nn.Module and ScriptModule.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.model.basic_modules.ResBlock.__module__">
+<span class="sig-name descname"><span class="pre">__module__</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'core.model.basic_modules'</span></em><a class="headerlink" href="#core.model.basic_modules.ResBlock.__module__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.model.basic_modules.ResBlock.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.model.basic_modules.ResBlock.forward" title="Permalink to this definition"></a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="core.model.basic_modules.SparsityConstraint">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.model.basic_modules.</span></span><span class="sig-name descname"><span class="pre">SparsityConstraint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">constraint_param</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scaling_param</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.model.basic_modules.SparsityConstraint" title="Permalink to this definition"></a></dt>
+<dd><p>A PyTorch module that applies a sigmoid activation function to its input, 
+then computes the KL divergence between the mean activation and a constant distribution. 
+This is used to encourage sparsity in the activations.</p>
+<dl class="simple">
+<dt>constraint_param: float</dt><dd><p>The parameter for the constant distribution in the KL divergence calculation.</p>
+</dd>
+<dt>scaling_param: float</dt><dd><p>The scaling factor for the KL divergence.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>forward(x: torch.Tensor) -&gt; Tuple[torch.Tensor, float]</dt><dd><p>Applies the sigmoid activation function to the input tensor, computes the KL divergence, 
+and returns both the activated tensor and the scaled KL divergence.</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.model.basic_modules.SparsityConstraint.__annotations__">
+<span class="sig-name descname"><span class="pre">__annotations__</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#core.model.basic_modules.SparsityConstraint.__annotations__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.model.basic_modules.SparsityConstraint.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">constraint_param</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scaling_param</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.model.basic_modules.SparsityConstraint.__init__" title="Permalink to this definition"></a></dt>
+<dd><p>Initializes internal Module state, shared by both nn.Module and ScriptModule.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.model.basic_modules.SparsityConstraint.__module__">
+<span class="sig-name descname"><span class="pre">__module__</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'core.model.basic_modules'</span></em><a class="headerlink" href="#core.model.basic_modules.SparsityConstraint.__module__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.model.basic_modules.SparsityConstraint.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.model.basic_modules.SparsityConstraint.forward" title="Permalink to this definition"></a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="core.model.basic_modules.VGG19_Features">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.model.basic_modules.</span></span><span class="sig-name descname"><span class="pre">VGG19_Features</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">constraint_locations</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attention</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constraint_param</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scaling_param</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.model.basic_modules.VGG19_Features" title="Permalink to this definition"></a></dt>
+<dd><p>A PyTorch module that extracts a non-pretrained VGG19 feature extractor, organizes it in a module where 
+you can apply the sparsity constraints anywhere as well as add attention layers.</p>
+<dl class="simple">
+<dt>name: str</dt><dd><p>The name of the VGG19_Features module, which includes the activation function used.</p>
+</dd>
+<dt>feature_extractor: torch.nn.Sequential</dt><dd><p>A sequence of operations that define the feature extraction process.</p>
+</dd>
+<dt>layers: List[str]</dt><dd><p>A list of names of the ConvBlock layers in the feature extractor.</p>
+</dd>
+<dt>attention_layers: List[str]</dt><dd><p>A list of names of the Constrained_CBAM layers in the feature extractor.</p>
+</dd>
+<dt>all_layers: List[str]</dt><dd><p>A list of names of all the ConvBlock and Constrained_CBAM layers in the feature extractor.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>forward(x: torch.Tensor) -&gt; Tuple[torch.Tensor, float, float]</dt><dd><p>Applies the feature extraction process to the input tensor and returns the result, 
+along with the total KL divergence and attention loss.</p>
+</dd>
+<dt>get_activations(x: torch.Tensor, layer_name: str) -&gt; torch.Tensor</dt><dd><p>Applies the feature extraction process up to the specified layer to the input tensor and returns the result.</p>
+</dd>
+<dt>__len__() -&gt; int</dt><dd><p>Returns the number of layers in the feature extractor.</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.model.basic_modules.VGG19_Features.__annotations__">
+<span class="sig-name descname"><span class="pre">__annotations__</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#core.model.basic_modules.VGG19_Features.__annotations__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.model.basic_modules.VGG19_Features.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">constraint_locations</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attention</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constraint_param</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scaling_param</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.model.basic_modules.VGG19_Features.__init__" title="Permalink to this definition"></a></dt>
+<dd><p>Initializes internal Module state, shared by both nn.Module and ScriptModule.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.model.basic_modules.VGG19_Features.__len__">
+<span class="sig-name descname"><span class="pre">__len__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#core.model.basic_modules.VGG19_Features.__len__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.model.basic_modules.VGG19_Features.__module__">
+<span class="sig-name descname"><span class="pre">__module__</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'core.model.basic_modules'</span></em><a class="headerlink" href="#core.model.basic_modules.VGG19_Features.__module__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.model.basic_modules.VGG19_Features.add_attention_layers">
+<span class="sig-name descname"><span class="pre">add_attention_layers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attention</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constraint_param</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scaling_param</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.model.basic_modules.VGG19_Features.add_attention_layers" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.model.basic_modules.VGG19_Features.build_convs">
+<span class="sig-name descname"><span class="pre">build_convs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">features</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constraint_locations</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constraint_param</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scaling_param</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.model.basic_modules.VGG19_Features.build_convs" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.model.basic_modules.VGG19_Features.build_feature_extractor">
+<span class="sig-name descname"><span class="pre">build_feature_extractor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">features</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constraint_locations</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constraint_param</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scaling_param</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.model.basic_modules.VGG19_Features.build_feature_extractor" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.model.basic_modules.VGG19_Features.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.model.basic_modules.VGG19_Features.forward" title="Permalink to this definition"></a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.model.basic_modules.VGG19_Features.get_activations">
+<span class="sig-name descname"><span class="pre">get_activations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layer_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.model.basic_modules.VGG19_Features.get_activations" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+</section>
+<section id="core-model-attention-modules">
+<h2>core.model.attention_modules<a class="headerlink" href="#core-model-attention-modules" title="Permalink to this heading"></a></h2>
+<p>This module contains the attention mechanisms used in our model.</p>
+<span class="target" id="module-core.model.attention_modules"></span><dl class="py class">
+<dt class="sig sig-object py" id="core.model.attention_modules.BasicConv">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.model.attention_modules.</span></span><span class="sig-name descname"><span class="pre">BasicConv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">in_planes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_planes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernel_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stride</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">padding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dilation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groups</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">relu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bias</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.model.attention_modules.BasicConv" title="Permalink to this definition"></a></dt>
+<dd><p>This class is a basic convolutional layer, taken from <a class="reference external" href="https://github.com/Jongchan/attention-module/tree/master">git</a>.. It includes options for batch normalization and ReLU activation.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.model.attention_modules.BasicConv.__annotations__">
+<span class="sig-name descname"><span class="pre">__annotations__</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#core.model.attention_modules.BasicConv.__annotations__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.model.attention_modules.BasicConv.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">in_planes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_planes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernel_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stride</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">padding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dilation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groups</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">relu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bias</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.model.attention_modules.BasicConv.__init__" title="Permalink to this definition"></a></dt>
+<dd><p>Initializes internal Module state, shared by both nn.Module and ScriptModule.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.model.attention_modules.BasicConv.__module__">
+<span class="sig-name descname"><span class="pre">__module__</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'core.model.attention_modules'</span></em><a class="headerlink" href="#core.model.attention_modules.BasicConv.__module__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.model.attention_modules.BasicConv.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.model.attention_modules.BasicConv.forward" title="Permalink to this definition"></a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="core.model.attention_modules.ChannelGate">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.model.attention_modules.</span></span><span class="sig-name descname"><span class="pre">ChannelGate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gate_channels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduction_ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">16</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pool_types</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['avg',</span> <span class="pre">'max']</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.model.attention_modules.ChannelGate" title="Permalink to this definition"></a></dt>
+<dd><p>This class implements a channel gate, taken from <a class="reference external" href="https://github.com/Jongchan/attention-module/tree/master">git</a>.. It includes options for different types of pooling.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.model.attention_modules.ChannelGate.__annotations__">
+<span class="sig-name descname"><span class="pre">__annotations__</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#core.model.attention_modules.ChannelGate.__annotations__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.model.attention_modules.ChannelGate.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gate_channels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduction_ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">16</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pool_types</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['avg',</span> <span class="pre">'max']</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.model.attention_modules.ChannelGate.__init__" title="Permalink to this definition"></a></dt>
+<dd><p>Initializes internal Module state, shared by both nn.Module and ScriptModule.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.model.attention_modules.ChannelGate.__module__">
+<span class="sig-name descname"><span class="pre">__module__</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'core.model.attention_modules'</span></em><a class="headerlink" href="#core.model.attention_modules.ChannelGate.__module__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.model.attention_modules.ChannelGate.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.model.attention_modules.ChannelGate.forward" title="Permalink to this definition"></a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.model.attention_modules.ChannelGate.get_att_map">
+<span class="sig-name descname"><span class="pre">get_att_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.model.attention_modules.ChannelGate.get_att_map" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="core.model.attention_modules.ChannelPool">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.model.attention_modules.</span></span><span class="sig-name descname"><span class="pre">ChannelPool</span></span><a class="headerlink" href="#core.model.attention_modules.ChannelPool" title="Permalink to this definition"></a></dt>
+<dd><p>This class implements a channel pooling layer, taken from <a class="reference external" href="https://github.com/Jongchan/attention-module/tree/master">git</a>.. It returns the concatenation of the max and mean of its input.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.model.attention_modules.ChannelPool.__annotations__">
+<span class="sig-name descname"><span class="pre">__annotations__</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#core.model.attention_modules.ChannelPool.__annotations__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.model.attention_modules.ChannelPool.__module__">
+<span class="sig-name descname"><span class="pre">__module__</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'core.model.attention_modules'</span></em><a class="headerlink" href="#core.model.attention_modules.ChannelPool.__module__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.model.attention_modules.ChannelPool.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.model.attention_modules.ChannelPool.forward" title="Permalink to this definition"></a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="core.model.attention_modules.Constrained_CBAM">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.model.attention_modules.</span></span><span class="sig-name descname"><span class="pre">Constrained_CBAM</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gate_channels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constraint_param</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scaling_param</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduction_ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">16</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pool_types</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['avg',</span> <span class="pre">'max']</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_spatial</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.model.attention_modules.Constrained_CBAM" title="Permalink to this definition"></a></dt>
+<dd><p>This class implements a modified version of the Convolutional Block Attention Module (CBAM) with a L1 constraint. 
+It only includes depth-wise attention, also known as channel attention.</p>
+<dl class="simple">
+<dt><strong>Attributes</strong>:</dt><dd><p>gate_channels (int): The number of output channels in the attention module.
+constraint_param (float): The parameter for the L1 constraint.
+scaling_param (float): The scaling parameter for the attention module.
+index (int): The index of the attention module in the model.
+reduction_ratio (int, optional): The ratio for the channel reduction in the attention module. Default is 16.
+pool_types (list of str, optional): The types of pooling to use in the attention module. Default is [‘avg’, ‘max’].
+no_spatial (bool, optional): Whether to exclude spatial attention. Default is False.</p>
+</dd>
+</dl>
+<p><strong>Example usage</strong>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">model</span> <span class="kn">import</span> <span class="n">Constrained_CBAM</span>
+
+<span class="c1"># Initialize the Constrained_CBAM module</span>
+<span class="n">cbam</span> <span class="o">=</span> <span class="n">Constrained_CBAM</span><span class="p">(</span><span class="n">gate_channels</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span> <span class="n">constraint_param</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">scaling_param</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># Use the Constrained_CBAM module on an input</span>
+<span class="n">output</span><span class="p">,</span> <span class="n">l1</span> <span class="o">=</span> <span class="n">cbam</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.model.attention_modules.Constrained_CBAM.__annotations__">
+<span class="sig-name descname"><span class="pre">__annotations__</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#core.model.attention_modules.Constrained_CBAM.__annotations__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.model.attention_modules.Constrained_CBAM.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gate_channels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constraint_param</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scaling_param</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduction_ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">16</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pool_types</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['avg',</span> <span class="pre">'max']</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_spatial</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.model.attention_modules.Constrained_CBAM.__init__" title="Permalink to this definition"></a></dt>
+<dd><p>Initialize the Constrained_CBAM module.</p>
+<dl class="simple">
+<dt><strong>Parameters</strong>:</dt><dd><p>gate_channels (int): The number of output channels in the attention module.
+constraint_param (float): The parameter for the L1 constraint.
+scaling_param (float): The scaling parameter for the attention module.
+index (int): The index of the attention module in the model.
+reduction_ratio (int, optional): The ratio for the channel reduction in the attention module. Default is 16.
+pool_types (list of str, optional): The types of pooling to use in the attention module. Default is [‘avg’, ‘max’].
+no_spatial (bool, optional): Whether to exclude spatial attention. Default is False.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.model.attention_modules.Constrained_CBAM.__module__">
+<span class="sig-name descname"><span class="pre">__module__</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'core.model.attention_modules'</span></em><a class="headerlink" href="#core.model.attention_modules.Constrained_CBAM.__module__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.model.attention_modules.Constrained_CBAM.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.model.attention_modules.Constrained_CBAM.forward" title="Permalink to this definition"></a></dt>
+<dd><p>Forward pass of the Constrained_CBAM module.</p>
+<dl class="simple">
+<dt><strong>Parameters</strong>:</dt><dd><p>x (torch.Tensor): The input tensor.</p>
+</dd>
+<dt><strong>Returns</strong>:</dt><dd><p>tuple: The output tensor and the L1 norm.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.model.attention_modules.Constrained_CBAM.get_activations">
+<span class="sig-name descname"><span class="pre">get_activations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.model.attention_modules.Constrained_CBAM.get_activations" title="Permalink to this definition"></a></dt>
+<dd><p>Get the activation map of the Constrained_CBAM module.</p>
+<dl class="simple">
+<dt><strong>Parameters</strong>:</dt><dd><p>x (torch.Tensor): The input tensor.</p>
+</dd>
+<dt><strong>Returns</strong>:</dt><dd><p>torch.Tensor: The activation map.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="core.model.attention_modules.Flatten">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.model.attention_modules.</span></span><span class="sig-name descname"><span class="pre">Flatten</span></span><a class="headerlink" href="#core.model.attention_modules.Flatten" title="Permalink to this definition"></a></dt>
+<dd><p>This class is a simple layer that flattens its input, taken from <a class="reference external" href="https://github.com/Jongchan/attention-module/tree/master">git</a>..</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.model.attention_modules.Flatten.__annotations__">
+<span class="sig-name descname"><span class="pre">__annotations__</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#core.model.attention_modules.Flatten.__annotations__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.model.attention_modules.Flatten.__module__">
+<span class="sig-name descname"><span class="pre">__module__</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'core.model.attention_modules'</span></em><a class="headerlink" href="#core.model.attention_modules.Flatten.__module__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.model.attention_modules.Flatten.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.model.attention_modules.Flatten.forward" title="Permalink to this definition"></a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="core.model.attention_modules.logsumexp_2d">
+<span class="sig-prename descclassname"><span class="pre">core.model.attention_modules.</span></span><span class="sig-name descname"><span class="pre">logsumexp_2d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tensor</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.model.attention_modules.logsumexp_2d" title="Permalink to this definition"></a></dt>
+<dd><p>This function calculates the log-sum-exp of a 2D tensor, taken from <a class="reference external" href="https://github.com/Jongchan/attention-module/tree/master">git</a>.</p>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to Vae_Train_and_Extract’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="util.html" class="btn btn-neutral float-right" title="Metrics and Utilities" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Roland BERTIN-JOHANNET.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
