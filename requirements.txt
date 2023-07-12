@@ -1,0 +1,10 @@
+
+sphinx
+sphinx_rtd_theme
+readthedocs-sphinx-search
+torch
+torchvision
+Pillow
+lpips
+torchmetrics
+tqdm
