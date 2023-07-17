@@ -15,7 +15,6 @@ class OptionalSplitDataset(Dataset):
     **Attributes**:
         device (torch.device): The device to load the images onto.
         file_paths (list): A list of paths to the image files.
-        warned (bool): A flag used to issue a warning if the images are not 224x224.
 
     **Args**:
         root_dir (str): The root directory containing the image files.
@@ -53,7 +52,6 @@ class OptionalSplitDataset(Dataset):
         """
         self.device = device
         self.file_paths = self.get_all_image_paths(root_dir)
-        self.warned = False
         
         if self.device is not torch.device("cpu") and not torch.cuda.is_available():
             warnings.warn("The specified device is not available. Defaulting to CPU.")
